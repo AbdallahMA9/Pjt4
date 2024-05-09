@@ -1,26 +1,36 @@
+
+<?php require 'footer.php'; ?>
 <?php
-    require 'header.php';
-    //require 'oeuvres.php';
-    require 'bdd.php';
-    $bdd = connexion();
-    $oeuvres = $bdd->query('SELECT * FROM oeuvres');
+require 'header.php';
+//require 'oeuvres.php';
+require 'bdd.php';
+$bdd = connexion();
+$oeuvres = $bdd->query('SELECT * FROM oeuvres');
 
 
-    // Si l'URL ne contient pas d'id, on redirige sur la page d'accueil
-    if(empty($_GET['id'])) {
-        header('Location: index.php');
-    }
+// Si l'URL ne contient pas d'id, on redirige sur la page d'accueil
+if(empty($_GET['id'])) {
+    header('Location: index.php');
+}
 
 
-
+try {
     $requete = $bdd->prepare('SELECT * FROM oeuvres WHERE id = ? ');
     $requete->execute([$_GET['id']]);
-    $oeuvre=$requete->fetch();
+    $oeuvre = $requete->fetch();
 
-    // Si aucune oeuvre trouvé, on redirige vers la page d'accueil
-    if(is_null($oeuvre)) {
+    // Si aucune oeuvre trouvée, on redirige vers la page d'accueil
+    /*if(is_null($oeuvre)) {
+        header('Location: index.php');
+    }*/
+    if(!$oeuvre) {
         header('Location: index.php');
     }
+} catch (Exception $e) {
+    // En cas d'erreur lors de l'exécution de la requête, redirige vers la page d'accueil
+    header('Location: index.php');
+    exit; // Termine le script pour éviter toute exécution supplémentaire
+}
 ?>
 
 <article id="detail-oeuvre">
